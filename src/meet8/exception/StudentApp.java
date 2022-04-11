@@ -1,5 +1,6 @@
 package meet8.exception;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 /**
@@ -13,16 +14,27 @@ public class StudentApp {
         
         final int N_STUDENTS_DEFAULT = 3;
         int nStudents;
+        
+        try {
+            System.out.print("Number of Students\t: ");
+            nStudents = scanner.nextInt();
+            
+            if (nStudents < 0) {
+                System.out.println("[!!] Cannot less than 0");
+                System.out.println("Set to default...");
 
-        System.out.print("Number of Students\t: ");
-        nStudents = scanner.nextInt();
+                nStudents = N_STUDENTS_DEFAULT;
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong when"
+                    + " defining number of students.");
+            System.out.println(e);
 
-        if (nStudents < 0) {
-            System.out.println("[!!] Cannot less than 0");
-            System.out.println("Set to default...");
-
+            scanner.next();
             nStudents = N_STUDENTS_DEFAULT;
         }
+        
+        System.out.println(nStudents);
         
         Student[] students = new Student[nStudents];
         
@@ -31,14 +43,36 @@ public class StudentApp {
             double examResult;
             
             System.out.println("Student " + (i + 1) + "");
-           
+            
             System.out.print("Name\t: ");
-            name = scanner.next();
+            name = scanner.next(); // Maul
 
-            System.out.print("Exam\t: ");
-            examResult = scanner.nextDouble();
+            try {
+                System.out.print("Exam\t: ");
+                examResult = scanner.nextDouble();
+            } catch (InputMismatchException e1) {
+                System.out.println("Something went wrong when inputting data.");
+                System.out.println(e1);
+                scanner.next();
 
-            students[i] = new Student(name, examResult);
+                name += " <entityFromException>"; // Maul <entityFromException>
+                examResult = 0;
+            } catch (Exception e2) {
+                System.out.println("There's another exception happened!");
+                System.out.println(e2);
+                
+                name += " <entityFromException>"; // Maul <entityFromException>
+                examResult = 0;
+            } finally {
+                System.out.println("It is FINALLY!");
+            }
+            
+            try {
+                students[i] = new Student(name, examResult);
+            } catch (NullPointerException e) {
+                System.out.println("Something went wrong when creating instance.");
+                System.out.println(e);
+            }
         }
         
         for (Student student : students) {
@@ -48,7 +82,7 @@ public class StudentApp {
             System.out.print("\t| ");
             System.out.print(student.getExamResult());
             System.out.print("\t| ");
-            System.out.print(status);
+            System.out.println(status);
             
             System.out.println("-------------------");
         }
